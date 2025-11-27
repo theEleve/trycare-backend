@@ -31,4 +31,9 @@ export class PatientService {
   async findById(id: string): Promise<PatientDocument | null> {
     return this.patientModel.findById(id);
   }
+
+  async deleteById(id: string): Promise<{ deleted: boolean }> {
+    const result = await this.patientModel.deleteOne({ _id: id });
+    return { deleted: result.deletedCount > 0 };
+  }
 }
