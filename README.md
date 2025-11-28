@@ -1,7 +1,5 @@
 # 🏥 Hospital Queue Management System
 
-A robust, priority-based queue management system built with NestJS and MongoDB for the K-TechFest Hackathon.
-
 ## 📋 Table of Contents
 
 - [Overview](#overview)
