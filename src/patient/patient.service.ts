@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
@@ -6,6 +6,8 @@ import { Patient, PatientDocument } from './schemas/patient.schema';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { throwError } from 'rxjs';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { UpdatePatientDto } from './dto/upadate-patience.dto';
+import { FORBIDDEN_MESSAGE } from '@nestjs/core/guards';
 
 @Injectable()
 export class PatientService {
@@ -54,5 +56,29 @@ export class PatientService {
     const results = await this.patientModel.findById(id).select('-password');
     if (!results) throw new NotFoundException('user not found ');
     return results;
+  }
+
+  async upadateuser(id: string, updatePatientDto: UpdatePatientDto) {
+    const emailExists = await this.patientModel.findOne({
+      email: updatePatientDto.email,
+    });
+    if (emailExists) throw new ConflictException('Email already exists');
+    const OurUser = await this.patientModel.findByIdAndUpdate(
+      id,
+      { $set: { ...updatePatientDto } },
+      { new: true },
+    );
+    if (!OurUser) throw new NotFoundException('user not found ');
+    return updatePatientDto;
+  }
+
+  async GetAll(id: string) {
+    const user = await this.patientModel.findById(id);
+    if (!user) throw new NotFoundException('user not found ');
+    const role = user.role;
+    if (role === 'Patient')
+      throw new ForbiddenException('You dont have permission');
+    return this.patientModel.find()
+
   }
 }
