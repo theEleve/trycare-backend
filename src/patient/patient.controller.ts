@@ -14,7 +14,6 @@ import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/upadate-patience.dto';
 
 @Controller('patients')
-
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
 
@@ -36,7 +35,7 @@ export class PatientController {
   }
 
   @Get(':id/details')
-  async getPatient(@Param('id') id: string){
+  async getPatient(@Param('id') id: string) {
     return await this.patientService.finduser(id);
   }
 
@@ -51,6 +50,6 @@ export class PatientController {
 
   @Get('allPatients/:id')
   async GetAllP(@Param('id') id: string) {
-    return await this.patientService.GetAll(id)
+    return await this.patientService.GetAll(id);
   }
 }
