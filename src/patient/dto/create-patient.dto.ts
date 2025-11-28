@@ -1,17 +1,21 @@
-import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsNotEmpty } from 'class-validator';
 
 export class CreatePatientDto {
+  
   @IsString()
+  @IsNotEmpty({ message: 'Name is required' })
   name: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: 'Email is invalid' })
+  @IsNotEmpty({ message: 'Email is required' })
   email: string;
 
-  @IsOptional()
   @IsString()
-  phone?: string;
+  @IsNotEmpty({ message: 'Phone number is required' })
+  phone: string;
 
   @IsString()
-  @MinLength(6)
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @IsNotEmpty({ message: 'Password is required' })
   password: string;
 }

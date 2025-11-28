@@ -26,14 +26,14 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-  const patient = await this.validatePatient(email, password);
+    const patient = await this.validatePatient(email, password);
 
   const payload = { sub: patient._id, email: patient.email, role: patient.role };
-  const token = this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload);
 
     return {
       access_token: token,
-        user: {
+      user: {
         id: patient._id,
         name: patient.name,
         email: patient.email,
@@ -41,5 +41,4 @@ export class AuthService {
       },
     };
   }
-
 }
