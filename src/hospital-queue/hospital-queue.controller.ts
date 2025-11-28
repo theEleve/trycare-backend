@@ -31,6 +31,7 @@ export class HospitalQueueController {
     };
   }
 
+  //retrieve queue for a specific doctor
   @Get('doctor/:doctor_id')
   async getDoctorQueue(@Param('doctor_id') doctor_id: string) {
     const queue = await this.queueService.getDoctorQueue(doctor_id);
