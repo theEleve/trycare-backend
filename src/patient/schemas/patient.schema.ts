@@ -14,7 +14,7 @@ export class Patient {
   @Prop()
   phone?: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, select: false })
   password: string;
 
   @Prop({ default: 'Patient' })

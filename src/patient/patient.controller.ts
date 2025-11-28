@@ -30,4 +30,9 @@ export class PatientController {
 
     return { message: 'Patient account deleted successfully' };
   }
+
+  @Post(':id/details')
+  async getPatient(@Param('id') id: string){
+    return await this.patientService.finduser(id);
+  }
 }
