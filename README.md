@@ -1,98 +1,270 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Hospital Queue System - Complete Setup Guide
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 📁 Project Structure
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Create this folder structure in your NestJS project:
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+```
+src/
+  hospital-queue/
+    ├── dto/
+    │   ├── create-queue.dto.ts
+    │   ├── update-priority.dto.ts
+    │   └── queue-response.dto.ts
+    ├── hospital-queue.schema.ts
+    ├── hospital-queue.service.ts
+    ├── hospital-queue.controller.ts
+    └── hospital-queue.module.ts
 ```
 
-## Compile and run the project
+## 🚀 Installation
+
+### 1. Install Required Dependencies
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install @nestjs/mongoose mongoose
+npm install class-validator class-transformer
 ```
 
-## Run tests
+### 2. Configure MongoDB Connection
+
+In your `app.module.ts`:
+
+```typescript
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { HospitalQueueModule } from './hospital-queue/hospital-queue.module';
+
+@Module({
+  imports: [
+    MongooseModule.forRoot('mongodb://localhost:27017/hospital-db'),
+    HospitalQueueModule,
+  ],
+})
+export class AppModule {}
+```
+
+### 3. Enable Validation Globally
+
+In your `main.ts`:
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Enable validation globally
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+## 📡 API Endpoints Reference
+
+### 1. Add Patient to Queue
 
 ```bash
-# unit tests
-$ npm run test
+POST /queue
+Content-Type: application/json
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+{
+  "hospital_id": "507f1f77bcf86cd799439011",
+  "doctor_id": "507f1f77bcf86cd799439012",
+  "patient_user_id": "507f1f77bcf86cd799439013",
+  "patient_diagnosis_report_id": "507f1f77bcf86cd799439014",
+  "priority_level": 7
+}
 ```
 
-## Deployment
+**Response:**
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```json
+{
+  "success": true,
+  "message": "Patient added to queue successfully",
+  "data": {
+    "_id": "507f1f77bcf86cd799439015",
+    "hospital_id": "507f1f77bcf86cd799439011",
+    "doctor_id": "507f1f77bcf86cd799439012",
+    "patient_user_id": "507f1f77bcf86cd799439013",
+    "patient_diagnosis_report_id": "507f1f77bcf86cd799439014",
+    "queue_order": 3,
+    "priority_level": 7,
+    "created_at": "2025-11-28T10:30:00.000Z",
+    "updated_at": "2025-11-28T10:30:00.000Z"
+  }
+}
+```
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 2. Get Doctor's Queue
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+GET /queue/doctor/507f1f77bcf86cd799439012
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+**Response:**
 
-## Resources
+```json
+{
+  "success": true,
+  "message": "Doctor queue retrieved successfully",
+  "data": [
+    {
+      "_id": "...",
+      "queue_order": 1,
+      "priority_level": 10,
+      "patient_user_id": {
+        "name": "John Doe",
+        "email": "john@example.com"
+      },
+      ...
+    }
+  ],
+  "count": 5
+}
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### 3. Get Patient Position
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+GET /queue/position/507f1f77bcf86cd799439013/507f1f77bcf86cd799439012
+```
 
-## Support
+**Response:**
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```json
+{
+  "success": true,
+  "message": "Patient position retrieved successfully",
+  "data": {
+    "position": 3,
+    "total_in_queue": 8,
+    "estimated_wait_time": "45 minutes"
+  }
+}
+```
 
-## Stay in touch
+### 4. Update Priority
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+PATCH /queue/507f1f77bcf86cd799439015/priority
+Content-Type: application/json
 
-## License
+{
+  "priority_level": 10
+}
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### 5. Remove from Queue
+
+```bash
+DELETE /queue/507f1f77bcf86cd799439015
+```
+
+### 6. Get Hospital Queue
+
+```bash
+GET /queue/hospital/507f1f77bcf86cd799439011
+```
+
+### 7. Clear Doctor's Queue
+
+```bash
+DELETE /queue/doctor/507f1f77bcf86cd799439012/clear
+```
+
+### 8. Get Single Queue Entry
+
+```bash
+GET /queue/507f1f77bcf86cd799439015
+```
+
+## 🧪 Testing with Postman/Thunder Client
+
+### Example Flow:
+
+1. **Add 3 patients** with different priorities:
+   - Patient A: priority 5
+   - Patient B: priority 8
+   - Patient C: priority 3
+
+2. **Get doctor's queue** - Should be ordered: B (8), A (5), C (3)
+
+3. **Check Patient C's position** - Should be 3rd
+
+4. **Update Patient C to priority 10** (emergency)
+
+5. **Get queue again** - Now ordered: C (10), B (8), A (5)
+
+## ⚠️ Important Notes
+
+### Priority Levels (1-10):
+
+- **1-3**: Low priority (routine checkup)
+- **4-6**: Medium priority (follow-up)
+- **7-8**: High priority (sick/in pain)
+- **9-10**: Critical (emergency)
+
+### Error Handling:
+
+The system handles:
+
+- ✅ Invalid MongoDB IDs
+- ✅ Duplicate queue entries
+- ✅ Not found errors
+- ✅ Validation errors
+
+### Features:
+
+- ✅ Automatic queue ordering
+- ✅ Priority-based sorting
+- ✅ Duplicate prevention
+- ✅ Estimated wait time
+- ✅ Proper logging
+- ✅ Input validation
+- ✅ Error handling
+- ✅ MongoDB indexes for performance
+
+## 🎯 Next Steps
+
+1. **Add authentication/authorization** to protect endpoints
+2. **Add WebSocket** for real-time queue updates
+3. **Add pagination** for large queues
+4. **Add queue history** tracking
+5. **Add notifications** when patient is next
+
+## 🐛 Common Issues
+
+### Issue: "MongooseError: Schema hasn't been registered"
+
+**Solution:** Make sure you've imported `HospitalQueueModule` in `app.module.ts`
+
+### Issue: "Validation failed"
+
+**Solution:** Check that all required fields are provided and have correct format
+
+### Issue: "Cast to ObjectId failed"
+
+**Solution:** Ensure you're passing valid MongoDB ObjectId strings (24 hex characters)
+
+## 💡 Pro Tips for Hackathon
+
+- Test each endpoint as you build
+- Use proper HTTP status codes
+- Keep responses consistent
+- Add logging for debugging
+- Handle errors gracefully
+- Document your API
+
+Good luck! 🚀
