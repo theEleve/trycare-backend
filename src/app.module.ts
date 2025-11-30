@@ -14,18 +14,15 @@ import { DoctorModule } from './hospital/doctor/doctor.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/trycare'),
+    MongooseModule.forRoot(
+      process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/trycare',
+    ),
     HospitalModule,
     DoctorModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
-    MongooseModule.forRoot(
-      process.env.MONGO_URI ||
-        'mongodb://localhost:27017/diagnosis_reports',
-    ),
     DiagnosisReportModule,
     HealthModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
