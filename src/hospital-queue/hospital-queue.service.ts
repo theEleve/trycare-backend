@@ -95,7 +95,7 @@ export class HospitalQueueService {
         .lean()
         .exec();
 
-      return queue;
+      return queue as any;
     }
   }
 
@@ -118,7 +118,7 @@ export class HospitalQueueService {
         .lean()
         .exec();
 
-      return queue;
+      return queue as any;
     } catch (error) {
       this.logger.warn(
         'Could not populate related data. Some schemas may not be registered yet.',
@@ -130,7 +130,7 @@ export class HospitalQueueService {
         .lean()
         .exec();
 
-      return queue;
+      return queue as any;
     }
   }
 
