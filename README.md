@@ -1,6 +1,6 @@
 # TryCare Backend - AI Medical Diagnosis System
 
-AI-powered medical triage system using NestJS and Google Gemini AI.
+AI-powered medical triage and diagnosis report management system using NestJS, MongoDB, and Google Gemini AI.
 
 ## Quick Setup
 
@@ -12,12 +12,14 @@ npm install
 ### 2. Configure Environment
 Create `.env` file in project root:
 ```env
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/<database>
 GEMINI_API_KEY=your_api_key_here
 GEMINI_MODEL=gemini-2.5-flash
 PORT=3000
+JWT_SECRET=your_jwt_secret_here
 ```
 
-Get your API key: https://aistudio.google.com/app/apikey
+Get your Gemini API key: https://aistudio.google.com/app/apikey
 
 ### 3. Start Server
 ```bash
@@ -439,12 +441,46 @@ export class ReportsService {
 
 ---
 
-## Environment Variables
+## Technologies Used
 
-```env
-GEMINI_API_KEY=your_api_key_here
-GEMINI_MODEL=gemini-2.5-flash
-PORT=3000
+- **NestJS** — Node.js framework for building scalable server-side applications
+- **TypeScript** — Typed JavaScript superset
+- **MongoDB** — NoSQL database with Mongoose ODM
+- **Google Gemini AI** — AI-powered diagnosis generation
+- **JWT** — Authentication and authorization
+- **ESLint & Prettier** — Code linting and formatting
+- **Jest** — Testing framework
+
+---
+
+## API Endpoints Reference
+
+### Diagnosis Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/diagnosis/submit` | Submit diagnosis with AI analysis |
+| POST | `/ai/diagnose` | Direct AI diagnosis (development) |
+
+### Diagnosis Report Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/diagnosis-report` | Create a new diagnosis report |
+| GET | `/diagnosis-report/:id` | Get diagnosis report by ID |
+| GET | `/diagnosis-report/patient/:patientUserId` | Get patient's reports |
+| PATCH | `/diagnosis-report/feedback/:id` | Update doctor feedback |
+
+### Health Check
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health/db` | Check MongoDB connection status |
+
+---
+
+## Testing
+
+Run the unit tests:
+```bash
+npm run test
 ```
 
 ---
@@ -452,3 +488,5 @@ PORT=3000
 ## License
 
 UNLICENSED - Private use only
+
+For further enquiries contact: austinibe15@gmail.com
