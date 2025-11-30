@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AIModule } from './ai/ai.module';
+import { DiagnosisModule } from './diagnosis/diagnosis.module';
 import { PatientModule } from './patient/patient.module';
 import { AuthModule } from './auth/auth.module';
 import { DiagnosisReportModule } from './diagnosis-report/diagnosis-report.module';
@@ -22,6 +24,8 @@ import { DoctorModule } from './hospital/doctor/doctor.module';
       }),
       inject: [ConfigService],
     }),
+    AIModule,
+    DiagnosisModule,
     PatientModule,
     AuthModule,
     HospitalModule,
