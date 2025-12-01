@@ -3,12 +3,12 @@ import { Document, Types } from 'mongoose';
 
 export type HospitalQueueDocument = HospitalQueue & Document;
 
-@Schema({ 
-  timestamps: { 
-    createdAt: 'created_at', 
-    updatedAt: 'updated_at' 
+@Schema({
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   },
-  collection: 'hospital_queues'
+  collection: 'hospital_queues',
 })
 export class HospitalQueue {
   @Prop({ type: Types.ObjectId, required: true, ref: 'Hospital', index: true })

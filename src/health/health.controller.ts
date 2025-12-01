@@ -7,19 +7,27 @@ export class HealthController {
   constructor(@InjectConnection() private readonly connection: Connection) {}
 
   @Get('db')
-  checkDatabase() {
-    const state = this.connection.readyState;
+  checkDatabase(): { status: string; readyState: number } {
+    const state: number = this.connection.readyState as number;
 
     // MongoDB readyState mapping
-    const states = {
-      0: 'DISCONNECTED',
-      1: 'CONNECTED',
-      2: 'CONNECTING',
-      3: 'DISCONNECTING',
+    const getStateLabel = (readyState: number): string => {
+      switch (readyState) {
+        case 0:
+          return 'DISCONNECTED';
+        case 1:
+          return 'CONNECTED';
+        case 2:
+          return 'CONNECTING';
+        case 3:
+          return 'DISCONNECTING';
+        default:
+          return 'UNKNOWN';
+      }
     };
 
     return {
-      status: states[state],
+      status: getStateLabel(state),
       readyState: state,
     };
   }

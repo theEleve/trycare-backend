@@ -19,6 +19,18 @@ export class Patient {
 
   @Prop({ default: 'Patient' })
   role: string;
+
+  @Prop()
+  age?: number;
+
+  @Prop({ enum: ['Male', 'Female', 'Other'] })
+  gender?: string;
+
+  @Prop({ unique: true, sparse: true })
+  patient_code?: string;
+
+  @Prop({ type: [String], default: [] })
+  medical_history?: string[];
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);

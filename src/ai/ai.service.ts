@@ -14,6 +14,26 @@ export interface AIGenerateDiagnosisOutput {
   severityScore: number;
 }
 
+interface GeminiAPIResponse {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{
+        text?: string;
+      }>;
+    };
+  }>;
+  error?: {
+    message?: string;
+  };
+}
+
+interface ParsedAIResponse {
+  suggestedDiagnosis?: string;
+  severityRank?: string;
+  managementTips?: string[];
+  reasoning?: string;
+}
+
 @Injectable()
 export class AIService {
   private readonly logger = new Logger(AIService.name);
@@ -25,7 +45,7 @@ export class AIService {
     this.apiKey = process.env.GEMINI_API_KEY || '';
     this.model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     this.apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent`;
-    
+
     if (!this.apiKey) {
       this.logger.warn('⚠️ GEMINI_API_KEY not found in environment variables');
     }
@@ -52,10 +72,16 @@ export class AIService {
     }
 
     const systemPrompt = this.getDiseaseSystemPrompt(disease);
-    const userPrompt = this.formatUserPrompt(disease, symptoms, additionalNotes);
+    const userPrompt = this.formatUserPrompt(
+      disease,
+      symptoms,
+      additionalNotes,
+    );
     const aiResponse = await this.callGeminiAPI(systemPrompt, userPrompt);
     const parsedResponse = this.parseAIResponse(aiResponse);
-    const severityScore = this.calculateSeverityScore(parsedResponse.severityRank);
+    const severityScore = this.calculateSeverityScore(
+      parsedResponse.severityRank,
+    );
 
     return {
       ...parsedResponse,
@@ -189,7 +215,7 @@ ${JSON.stringify(symptoms, null, 2)}`;
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = (await response.json()) as GeminiAPIResponse;
         this.logger.error(`Gemini API error: ${JSON.stringify(errorData)}`);
         throw new HttpException(
           `AI service error: ${errorData.error?.message || 'Unknown error'}`,
@@ -197,11 +223,13 @@ ${JSON.stringify(symptoms, null, 2)}`;
         );
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as GeminiAPIResponse;
       const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!aiResponse) {
-        this.logger.error(`Empty AI response. Full data: ${JSON.stringify(data)}`);
+        this.logger.error(
+          `Empty AI response. Full data: ${JSON.stringify(data)}`,
+        );
         throw new HttpException(
           'AI service returned empty response',
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -214,9 +242,10 @@ ${JSON.stringify(symptoms, null, 2)}`;
       if (error instanceof HttpException) {
         throw error;
       }
-      this.logger.error(`Failed to call Gemini API: ${error.message}`);
+      const err = error as Error;
+      this.logger.error(`Failed to call Gemini API: ${err.message}`);
       throw new HttpException(
-        `Failed to analyze symptoms: ${error.message}`,
+        `Failed to analyze symptoms: ${err.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -225,25 +254,24 @@ ${JSON.stringify(symptoms, null, 2)}`;
   /**
    * Parses and validates AI response with fallback handling for malformed output
    */
-  private parseAIResponse(aiResponse: string): Omit<
-    AIGenerateDiagnosisOutput,
-    'severityScore'
-  > {
+  private parseAIResponse(
+    aiResponse: string,
+  ): Omit<AIGenerateDiagnosisOutput, 'severityScore'> {
     try {
       let cleanedResponse = aiResponse.trim();
-      
+
       if (cleanedResponse.includes('```')) {
         cleanedResponse = cleanedResponse
           .replace(/```json\n?/gi, '')
           .replace(/```\n?/g, '')
           .trim();
       }
-      
+
       const jsonStart = cleanedResponse.indexOf('{');
       if (jsonStart > 0) {
         cleanedResponse = cleanedResponse.substring(jsonStart);
       }
-      
+
       const jsonEnd = cleanedResponse.lastIndexOf('}');
       if (jsonEnd > 0 && jsonEnd < cleanedResponse.length - 1) {
         cleanedResponse = cleanedResponse.substring(0, jsonEnd + 1);
@@ -251,20 +279,25 @@ ${JSON.stringify(symptoms, null, 2)}`;
 
       this.logger.debug(`Cleaned response: ${cleanedResponse}`);
 
-      let parsed;
+      let parsed: ParsedAIResponse;
       try {
-        parsed = JSON.parse(cleanedResponse);
+        parsed = JSON.parse(cleanedResponse) as ParsedAIResponse;
       } catch (parseError) {
-        this.logger.error(`JSON parse error: ${parseError.message}`);
+        const error = parseError as Error;
+        this.logger.error(`JSON parse error: ${error.message}`);
         this.logger.error(`Attempted to parse: ${cleanedResponse}`);
         return this.getFallbackResponse();
       }
-      const suggestedDiagnosis = parsed.suggestedDiagnosis || 'Unable to determine diagnosis from symptoms provided';
+      const suggestedDiagnosis =
+        parsed.suggestedDiagnosis ||
+        'Unable to determine diagnosis from symptoms provided';
       const severityRank = this.validateSeverityRank(parsed.severityRank);
-      const managementTips = Array.isArray(parsed.managementTips) 
-        ? parsed.managementTips 
+      const managementTips = Array.isArray(parsed.managementTips)
+        ? parsed.managementTips
         : ['Consult a healthcare professional for proper evaluation'];
-      const reasoning = parsed.reasoning || 'AI analysis was inconclusive. Medical consultation recommended.';
+      const reasoning =
+        parsed.reasoning ||
+        'AI analysis was inconclusive. Medical consultation recommended.';
 
       return {
         suggestedDiagnosis,
@@ -273,9 +306,10 @@ ${JSON.stringify(symptoms, null, 2)}`;
         reasoning,
       };
     } catch (error) {
-      this.logger.error(`Unexpected error in parseAIResponse: ${error.message}`);
+      const err = error as Error;
+      this.logger.error(`Unexpected error in parseAIResponse: ${err.message}`);
       this.logger.error(`Original response: ${aiResponse}`);
-      
+
       return this.getFallbackResponse();
     }
   }
@@ -283,35 +317,47 @@ ${JSON.stringify(symptoms, null, 2)}`;
   /**
    * Validates severity rank and provides safe default if invalid
    */
-  private validateSeverityRank(rank: any): 'Low' | 'Mild' | 'Severe' {
-    if (['Low', 'Mild', 'Severe'].includes(rank)) {
-      return rank;
+  private validateSeverityRank(
+    rank: string | undefined,
+  ): 'Low' | 'Mild' | 'Severe' {
+    const validRanks = ['Low', 'Mild', 'Severe'] as const;
+    if (rank && validRanks.includes(rank as 'Low' | 'Mild' | 'Severe')) {
+      return rank as 'Low' | 'Mild' | 'Severe';
     }
-    this.logger.warn(`Invalid severity rank: ${rank}, defaulting to Mild`);
+    this.logger.warn(
+      `Invalid severity rank: ${rank ?? 'undefined'}, defaulting to Mild`,
+    );
     return 'Mild';
   }
 
   /**
    * Returns safe fallback response when AI output cannot be parsed
    */
-  private getFallbackResponse(): Omit<AIGenerateDiagnosisOutput, 'severityScore'> {
+  private getFallbackResponse(): Omit<
+    AIGenerateDiagnosisOutput,
+    'severityScore'
+  > {
     this.logger.warn('Returning fallback response due to parsing failure');
     return {
-      suggestedDiagnosis: 'Unable to generate AI diagnosis. Please consult a healthcare professional.',
+      suggestedDiagnosis:
+        'Unable to generate AI diagnosis. Please consult a healthcare professional.',
       severityRank: 'Mild',
       managementTips: [
         'Seek immediate medical attention for proper evaluation',
         'Do not self-diagnose or self-medicate',
         'Provide complete symptom information to your doctor',
       ],
-      reasoning: 'AI analysis could not be completed. Professional medical evaluation is strongly recommended.',
+      reasoning:
+        'AI analysis could not be completed. Professional medical evaluation is strongly recommended.',
     };
   }
 
   /**
    * Converts severity rank to numeric score for queue prioritization
    */
-  private calculateSeverityScore(severityRank: 'Low' | 'Mild' | 'Severe'): number {
+  private calculateSeverityScore(
+    severityRank: 'Low' | 'Mild' | 'Severe',
+  ): number {
     const scoreMap = {
       Low: 20,
       Mild: 60,

@@ -1,6 +1,17 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  Param,
+} from '@nestjs/common';
 import { DiagnosisService } from './diagnosis.service';
-import type { SubmitDiagnosisInput, DiagnosisResult } from './diagnosis.service';
+import type {
+  SubmitDiagnosisInput,
+  DiagnosisResult,
+} from './diagnosis.service';
 
 /**
  * Handles patient diagnosis submission and retrieval endpoints
@@ -11,7 +22,9 @@ export class DiagnosisController {
 
   @Post('submit')
   @HttpCode(HttpStatus.OK)
-  async submitDiagnosis(@Body() input: SubmitDiagnosisInput): Promise<DiagnosisResult> {
+  async submitDiagnosis(
+    @Body() input: SubmitDiagnosisInput,
+  ): Promise<DiagnosisResult> {
     return await this.diagnosisService.submitDiagnosis(input);
   }
 
@@ -24,6 +37,8 @@ export class DiagnosisController {
   async getPatientHistory(
     @Param('patientUserId') patientUserId: string,
   ): Promise<DiagnosisResult[]> {
-    return await this.diagnosisService.getPatientDiagnosisHistory(patientUserId);
+    return await this.diagnosisService.getPatientDiagnosisHistory(
+      patientUserId,
+    );
   }
 }

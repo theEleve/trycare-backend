@@ -1,15 +1,15 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Delete, 
-  Patch, 
-  Body, 
-  Param, 
-  HttpCode, 
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Patch,
+  Body,
+  Param,
+  HttpCode,
   HttpStatus,
   UsePipes,
-  ValidationPipe 
+  ValidationPipe,
 } from '@nestjs/common';
 import { HospitalQueueService } from './hospital-queue.service';
 import { CreateQueueDto } from './dto/create-queue.dto';

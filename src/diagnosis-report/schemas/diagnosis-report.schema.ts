@@ -24,4 +24,5 @@ export class DiagnosisReport {
   status: string; // pending | reviewed | closed
 }
 
-export const DiagnosisReportSchema = SchemaFactory.createForClass(DiagnosisReport);
+export const DiagnosisReportSchema =
+  SchemaFactory.createForClass(DiagnosisReport);

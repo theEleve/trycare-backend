@@ -95,7 +95,7 @@ export class HospitalQueueService {
         .lean()
         .exec();
 
-      return queue as any;
+      return queue as unknown as HospitalQueueDocument[];
     }
   }
 
@@ -118,8 +118,8 @@ export class HospitalQueueService {
         .lean()
         .exec();
 
-      return queue as any;
-    } catch (error) {
+      return queue as unknown as HospitalQueueDocument[];
+    } catch {
       this.logger.warn(
         'Could not populate related data. Some schemas may not be registered yet.',
       );
@@ -130,7 +130,7 @@ export class HospitalQueueService {
         .lean()
         .exec();
 
-      return queue as any;
+      return queue as unknown as HospitalQueueDocument[];
     }
   }
 
@@ -245,7 +245,7 @@ export class HospitalQueueService {
         }
 
         return queue;
-      } catch (populateError) {
+      } catch {
         // Fallback without populate
         const queue = await this.queueModel.findById(queue_id).lean().exec();
 

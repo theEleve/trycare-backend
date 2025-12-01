@@ -42,7 +42,7 @@ export class PatientService {
   }
 
   async findByEmail(email: string): Promise<PatientDocument | null> {
-    return this.patientModel.findOne({ email }).exec();
+    return this.patientModel.findOne({ email }).select('+password').exec();
   }
 
   async findById(id: string): Promise<PatientDocument | null> {

@@ -12,6 +12,7 @@ import { HealthModule } from './health/health.module';
 import { HospitalModule } from './hospital/hospital.module';
 import { DoctorModule } from './hospital/doctor/doctor.module';
 import { HospitalQueueModule } from './hospital-queue/hospital-queue.module';
+import { QuestionsModule } from './questions/questions.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { HospitalQueueModule } from './hospital-queue/hospital-queue.module';
     DiagnosisReportModule,
     HealthModule,
     HospitalQueueModule,
+    QuestionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

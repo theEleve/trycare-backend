@@ -23,7 +23,10 @@ export class DiagnosisReportController {
   }
 
   @Patch('feedback/:id')
-  updateFeedback(@Param('id') id: string, @Body() dto: UpdateDiagnosisFeedbackDto) {
+  updateFeedback(
+    @Param('id') id: string,
+    @Body() dto: UpdateDiagnosisFeedbackDto,
+  ) {
     return this.service.updateDoctorFeedback(id, dto);
   }
 }

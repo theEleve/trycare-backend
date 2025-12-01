@@ -1,6 +1,9 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AIService } from './ai.service';
-import type { AIGenerateDiagnosisInput, AIGenerateDiagnosisOutput } from './ai.service';
+import type {
+  AIGenerateDiagnosisInput,
+  AIGenerateDiagnosisOutput,
+} from './ai.service';
 
 /**
  * Provides direct access to AI diagnosis functionality for testing and development
