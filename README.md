@@ -5,6 +5,7 @@ AI-powered medical triage, diagnosis report management, and hospital queue syste
 ## 🎯 Overview
 
 TryCare is a comprehensive healthcare management platform combining:
+
 - **AI-Powered Diagnosis**: Using Google Gemini AI for medical triage
 - **Hospital Queue Management**: Priority-based patient queuing system
 - **Report Management**: Complete diagnosis report tracking
@@ -15,12 +16,15 @@ TryCare is a comprehensive healthcare management platform combining:
 ## 🚀 Quick Setup
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Configure Environment
+
 Create `.env` file in project root:
+
 ```env
 MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/<database>
 GEMINI_API_KEY=your_api_key_here
@@ -33,6 +37,7 @@ JWT_EXPIRATION=7d
 Get your Gemini API key: https://aistudio.google.com/app/apikey
 
 ### 3. Start Server
+
 ```bash
 npm run start:dev
 ```
@@ -44,12 +49,14 @@ Server runs on `http://localhost:3000`
 ## ✨ Features
 
 ### 1. AI Diagnosis
+
 - Symptom analysis using Google Gemini AI
 - Severity scoring (0-100)
 - Treatment recommendations
 - Diagnosis reasoning
 
 ### 2. Hospital Queue Management
+
 - Priority-based queuing (1-10 scale)
 - Automatic position tracking
 - Wait time estimation
@@ -57,11 +64,13 @@ Server runs on `http://localhost:3000`
 - Real-time updates
 
 ### 3. Diagnosis Reports
+
 - Create and manage patient reports
 - Doctor feedback integration
 - Report history tracking
 
 ### 4. Authentication & Authorization
+
 - JWT-based authentication
 - Role-based access (patient, doctor, admin)
 - Secure password hashing with bcrypt
@@ -71,40 +80,45 @@ Server runs on `http://localhost:3000`
 ## 📡 API Endpoints
 
 ### AI Diagnosis
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/ai/diagnose` | Direct AI diagnosis (development) |
-| POST | `/diagnosis/submit` | Submit diagnosis with AI analysis |
+
+| Method | Endpoint            | Description                       |
+| ------ | ------------------- | --------------------------------- |
+| POST   | `/ai/diagnose`      | Direct AI diagnosis (development) |
+| POST   | `/diagnosis/submit` | Submit diagnosis with AI analysis |
 
 ### Queue Management
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/queue` | Add patient to queue |
-| GET | `/queue/doctor/:doctor_id` | Get doctor's queue |
-| GET | `/queue/hospital/:hospital_id` | Get hospital queue |
-| GET | `/queue/position/:patient_id/:doctor_id` | Get patient position |
-| PATCH | `/queue/:queue_id/priority` | Update priority level |
-| DELETE | `/queue/:queue_id` | Remove from queue |
-| DELETE | `/queue/doctor/:doctor_id/clear` | Clear doctor queue |
+
+| Method | Endpoint                                 | Description           |
+| ------ | ---------------------------------------- | --------------------- |
+| POST   | `/queue`                                 | Add patient to queue  |
+| GET    | `/queue/doctor/:doctor_id`               | Get doctor's queue    |
+| GET    | `/queue/hospital/:hospital_id`           | Get hospital queue    |
+| GET    | `/queue/position/:patient_id/:doctor_id` | Get patient position  |
+| PATCH  | `/queue/:queue_id/priority`              | Update priority level |
+| DELETE | `/queue/:queue_id`                       | Remove from queue     |
+| DELETE | `/queue/doctor/:doctor_id/clear`         | Clear doctor queue    |
 
 ### Diagnosis Reports
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/diagnosis-report` | Create new report |
-| GET | `/diagnosis-report/:id` | Get report by ID |
-| GET | `/diagnosis-report/patient/:patientUserId` | Get patient's reports |
-| PATCH | `/diagnosis-report/feedback/:id` | Update doctor feedback |
+
+| Method | Endpoint                                   | Description            |
+| ------ | ------------------------------------------ | ---------------------- |
+| POST   | `/diagnosis-report`                        | Create new report      |
+| GET    | `/diagnosis-report/:id`                    | Get report by ID       |
+| GET    | `/diagnosis-report/patient/:patientUserId` | Get patient's reports  |
+| PATCH  | `/diagnosis-report/feedback/:id`           | Update doctor feedback |
 
 ### Health Check
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health/db` | Check MongoDB connection |
+
+| Method | Endpoint     | Description              |
+| ------ | ------------ | ------------------------ |
+| GET    | `/health/db` | Check MongoDB connection |
 
 ---
 
 ## 🔌 Using AI Service
 
 ### Import AIModule
+
 ```typescript
 import { Module } from '@nestjs/common';
 import { AIModule } from '../ai/ai.module';
@@ -118,6 +132,7 @@ export class YourModule {}
 ```
 
 ### Call AIService
+
 ```typescript
 import { Injectable } from '@nestjs/common';
 import { AIService } from '../ai/ai.service';
@@ -146,6 +161,7 @@ export class YourService {
 ## 🏥 Queue Management
 
 ### Add Patient to Queue
+
 ```bash
 curl -X POST http://localhost:3000/queue \
   -H "Content-Type: application/json" \
@@ -159,14 +175,16 @@ curl -X POST http://localhost:3000/queue \
 ```
 
 ### Priority Level Guide
-| Level | Description | Use Case |
-|-------|-------------|----------|
-| 1-3 | Low Priority | Routine checkup, follow-up |
-| 4-6 | Medium Priority | Sick but stable |
-| 7-8 | High Priority | Significant pain/discomfort |
-| 9-10 | Critical | Emergency, life-threatening |
+
+| Level | Description     | Use Case                    |
+| ----- | --------------- | --------------------------- |
+| 1-3   | Low Priority    | Routine checkup, follow-up  |
+| 4-6   | Medium Priority | Sick but stable             |
+| 7-8   | High Priority   | Significant pain/discomfort |
+| 9-10  | Critical        | Emergency, life-threatening |
 
 ### Wait Time Calculation
+
 - Average consultation time: 15 minutes
 - Formula: `position × 15 minutes`
 
@@ -189,11 +207,13 @@ curl -X POST http://localhost:3000/queue \
 ## 🧪 Testing
 
 Run the unit tests:
+
 ```bash
 npm run test
 ```
 
 Run tests with coverage:
+
 ```bash
 npm run test:cov
 ```
@@ -220,14 +240,14 @@ src/
 
 ## 🔧 Environment Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| MONGO_URI | MongoDB connection string | `mongodb+srv://user:pass@cluster...` |
-| GEMINI_API_KEY | Google Gemini API key | `AIza...` |
-| GEMINI_MODEL | Gemini model version | `gemini-2.5-flash` |
-| PORT | Server port | `3000` |
-| JWT_SECRET | JWT signing secret | `your_secret_here` |
-| JWT_EXPIRATION | JWT expiration time | `7d` |
+| Variable       | Description               | Example                              |
+| -------------- | ------------------------- | ------------------------------------ |
+| MONGO_URI      | MongoDB connection string | `mongodb+srv://user:pass@cluster...` |
+| GEMINI_API_KEY | Google Gemini API key     | `AIza...`                            |
+| GEMINI_MODEL   | Gemini model version      | `gemini-2.5-flash`                   |
+| PORT           | Server port               | `3000`                               |
+| JWT_SECRET     | JWT signing secret        | `your_secret_here`                   |
+| JWT_EXPIRATION | JWT expiration time       | `7d`                                 |
 
 ---
 
@@ -240,7 +260,3 @@ UNLICENSED - Private use only
 ## 📞 Contact
 
 For further enquiries contact: austinibe15@gmail.com
-
----
-
-**Happy Coding! 🚀**
