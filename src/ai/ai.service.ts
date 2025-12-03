@@ -43,7 +43,7 @@ export class AIService {
 
   constructor() {
     this.apiKey = process.env.GEMINI_API_KEY || '';
-    this.model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+    this.model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
     this.apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent`;
 
     if (!this.apiKey) {
@@ -224,14 +224,24 @@ ${JSON.stringify(symptoms, null, 2)}`;
       }
 
       const data = (await response.json()) as GeminiAPIResponse;
+
+      // Log the full response for debugging
+      this.logger.debug(`Full Gemini API response: ${JSON.stringify(data)}`);
+
       const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!aiResponse) {
         this.logger.error(
-          `Empty AI response. Full data: ${JSON.stringify(data)}`,
+          `Empty AI response. Full data: ${JSON.stringify(data, null, 2)}`,
+        );
+        this.logger.error(
+          `Response structure: candidates=${!!data.candidates}, ` +
+            `candidates[0]=${!!data.candidates?.[0]}, ` +
+            `content=${!!data.candidates?.[0]?.content}, ` +
+            `parts=${!!data.candidates?.[0]?.content?.parts}`,
         );
         throw new HttpException(
-          'AI service returned empty response',
+          'AI service returned empty response. Check server logs for details.',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
