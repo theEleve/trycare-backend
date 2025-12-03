@@ -73,7 +73,7 @@ export class DiagnosisService {
         reasoning: aiResult.reasoning,
       },
       severity_score: aiResult.severityScore,
-      model_version: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+      model_version: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
       submitted_at: new Date(),
     });
 
@@ -93,7 +93,7 @@ export class DiagnosisService {
         reasoning: aiResult.reasoning,
       },
       severityScore: aiResult.severityScore,
-      modelVersion: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+      modelVersion: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
       submittedAt: savedDiagnosis.submitted_at,
     };
   }
